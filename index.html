@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AnimCraft Studio</title>
+
+  <!-- 🖼 Scratch 风格 Base64 Favicon -->
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNDJiMWZmIiBkPSJNMjU2IDQ4YzEwNi4xIDAgMTkyIDg1LjkgMTkyIDE5MnMtODUuOSAxOTItMTkyIDE5Mi0xOTItODUuOS0xOTItMTkyczg1LjktMTkyIDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE3Ni41IDI4OGgxNTljMjEuMiAwIDM4LjUtMTcuMyAzOC41LTM4LjVzLTE3LjMtMzguNS0zOC41LTM4LjVoLTE1OWMtMjEuMiAwLTM4LjUgMTcuMy0zOC41IDM4LjVzMTcuMyAzOC41IDM4LjUgMzguNXoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjU2IDM4NGM0NC4xIDAgODAgMzUuOSA4MCA4MHMtMzUuOSA4MC04MCA4MC04MC0zNS45LTgwLTgwczM1LjktODAgODAtODB6Ii8+PC9zdmc+" />
+  <!-- Apple Touch Icon (for iOS) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNDJiMWZmIiBkPSJNMjU2IDQ4YzEwNi4xIDAgMTkyIDg1LjkgMTkyIDE5MnMtODUuOSAxOTItMTkyIDE5Mi0xOTItODUuOS0xOTItMTkyczg1LjktMTkyIDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE3Ni41IDI4OGgxNTljMjEuMiAwIDM4LjUtMTcuMyAzOC41LTM4LjVzLTE3LjMtMzguNS0zOC41LTM4LjVoLTE1OWMtMjEuMiAwLTM4LjUgMTcuMy0zOC41IDM4LjVzMTcuMyAzOC41IDM4LjUgMzguNXoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjU2IDM4NGM0NC4xIDAgODAgMzUuOSA4MCA4MHMtMzUuOSA4MC04MCA4MC04MC0zNS45LTgwLTgwczM1LjktODAgODAtODB6Ii8+PC9zdmc+" />
+
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --panel: #ffffff;
+      --block-green: #4caf50;
+      --block-blue: #2196f3;
+      --block-purple: #9c27b0;
+      --block-orange: #ff9800;
+      --text: #333;
+      --border-radius: 16px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --panel: #1e1e1e;
+      --text: #e0e0e0;
+      --shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 16px;
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 240px 1fr 300px;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .panel h2 {
+        font-size: 18px;
+      }
+    }
+
+    .panel {
+      background: var(--panel);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    /* 深色模式输入框样式 */
+    [data-theme="dark"] .workspace-item input,
+    [data-theme="dark"] textarea {
+      background: #2a2a2a;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+
+    [data-theme="dark"] .query-item {
+      background: #2a2a2a;
+    }
+    [data-theme="dark"] .query-item:hover {
+      background: #333;
+      color: var(--block-green);
+    }
+
+    h2 {
+      color: var(--block-green);
+      margin-bottom: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--block-green);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+    .theme-toggle:hover {
+      background: rgba(76, 175, 80, 0.1);
+    }
+
+    .block {
+      background: var(--block-green);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin: 8px 0;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .block:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .block.blue { background: var(--block-blue); }
+    .block.purple { background: var(--block-purple); }
+    .block.orange { background: var(--block-orange); }
+
+    .workspace {
+      min-height: 300px;
+      background: var(--bg);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      position: relative;
+    }
+
+    .workspace-item {
+      background: var(--panel);
+      padding: 16px;
+      border-radius: 12px;
+      margin: 12px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .move-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #eee;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+    }
+    [data-theme="dark"] .move-btn {
+      background: #333;
+      color: #ccc;
+    }
+    .move-btn:hover { background: #ddd; }
+    [data-theme="dark"] .move-btn:hover { background: #444; }
+
+    .remove-btn {
+      color: #f44336;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 18px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .workspace-item input,
+    .workspace-item select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: white;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    button {
+      background: var(--block-green);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    button.secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    [data-theme="dark"] button.secondary {
+      background: #333;
+      color: #e0e0e0;
+    }
+
+    textarea {
+      width: 100%;
+      height: 160px;
+      background: white;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      margin-top: 12px;
+      resize: vertical;
+      font-size: 14px;
+    }
+
+    .query-browser {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+    .query-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 8px;
+      background: #f5f5f5;
+      margin: 4px 0;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .query-item:hover {
+      background: #e8f5e9;
+      color: var(--block-green);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .copy-btn {
+      background: #6c757d;
+      margin-top: 16px;
+    }
+    .copy-btn.copied {
+      background: #28a745;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 左侧：积木库 -->
+  <div class="panel">
+    <h2>
+      <span>🧩 积木库</span>
+      <button class="theme-toggle" id="themeToggle">🌓</button>
+    </h2>
+    <div class="block" data-type="playanim">🎬 播放动画</div>
+    <div class="block blue" data-type="if">🧠 条件 (IF)</div>
+    <div class="block orange" data-type="wait">⏱ 等待 (ticks)</div>
+    <div class="block purple" data-type="queue">🎞 动画队列</div>
+
+    <h2>🔍 Molang Query</h2>
+    <div class="query-browser" id="queryBrowser"></div>
+  </div>
+
+  <!-- 中间：工作区 -->
+  <div class="panel">
+    <h2>🧱 动画工作区</h2>
+    <div class="workspace" id="workspace"></div>
+    <div class="btn-group">
+      <button onclick="generate()">⚡ 生成指令 / JSON</button>
+      <button class="secondary" onclick="clearWorkspace()">🗑 清空</button>
+      <button class="secondary" onclick="loadProjectPrompt()">📂 导入</button>
+    </div>
+  </div>
+
+  <!-- 右侧：输出 -->
+  <div class="panel">
+    <h2>📋 输出结果</h2>
+    <textarea id="output" readonly placeholder="点击「生成」后显示..."></textarea>
+    <button class="copy-btn" id="copyBtn" onclick="copyOutput()">📋 复制全部</button>
+    <button onclick="downloadProject()" style="margin-top: 10px;">💾 导出工程 (.json)</button>
+  </div>
+</div>
+
+<script>
+// ========== 主题切换 ==========
+const themeToggle = document.getElementById('themeToggle');
+const body = document.body;
+
+// 读取本地存储的主题偏好
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+  body.setAttribute('data-theme', 'dark');
+}
+
+themeToggle.addEventListener('click', () => {
+  const isDark = body.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    body.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'light');
+  } else {
+    body.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+  }
+});
+
+// ========== 复制到剪贴板 ==========
+async function copyOutput() {
+  const output = document.getElementById('output').value;
+  if (!output.trim()) return;
+
+  try {
+    await navigator.clipboard.writeText(output);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ 已复制！';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 复制全部';
+      btn.classList.remove('copied');
+    }, 2000);
+  } catch (err) {
+    alert('❌ 无法复制，请手动选择文本');
+  }
+}
+
+// ========== 其余原有逻辑保持不变 ==========
+const MOLANG_QUERIES = [
+  "query.health", "query.max_health", "query.is_on_ground", "query.is_in_water",
+  "query.is_sneaking", "query.is_sprinting", "query.modified_move_speed",
+  "query.eye_height", "query.get_name", "query.distance_from_camera",
+  "query.anim_time", "query.life_time", "query.frame_alpha",
+  "query.position", "query.rotation", "query.camera_rotation",
+  "query.relative_block_state"
+];
+
+function initQueryBrowser() {
+  const browser = document.getElementById("queryBrowser");
+  MOLANG_QUERIES.forEach(q => {
+    const el = document.createElement("div");
+    el.className = "query-item";
+    el.textContent = q;
+    el.onclick = () => insertQueryToFocusedInput(q);
+    browser.appendChild(el);
+  });
+}
+initQueryBrowser();
+
+let currentFocusedInput = null;
+document.addEventListener('focusin', (e) => {
+  if (e.target.tagName === 'INPUT') {
+    currentFocusedInput = e.target;
+  }
+});
+document.addEventListener('focusout', () => {
+  setTimeout(() => currentFocusedInput = null, 100);
+});
+
+function insertQueryToFocusedInput(query) {
+  if (!currentFocusedInput) return;
+  const start = currentFocusedInput.selectionStart;
+  const end = currentFocusedInput.selectionEnd;
+  const value = currentFocusedInput.value;
+  currentFocusedInput.value = value.slice(0, start) + query + value.slice(end);
+  currentFocusedInput.focus();
+  currentFocusedInput.setSelectionRange(start + query.length, start + query.length);
+}
+
+function createBlock(type, values = null) {
+  const div = document.createElement("div");
+  div.className = "workspace-item";
+  div.dataset.blockType = type;
+
+  const header = document.createElement("div");
+  header.className = "block-header";
+
+  const title = document.createElement("strong");
+  if (type === "playanim") title.textContent = "🎬 /playanimation";
+  else if (type === "if") title.textContent = "🧠 IF 条件";
+  else if (type === "wait") title.textContent = "⏱ 等待";
+  else if (type === "queue") title.textContent = "🎞 动画队列标签";
+  header.appendChild(title);
+
+  const ops = document.createElement("div");
+  ops.style.display = "flex"; ops.style.gap = "6px";
+
+  const upBtn = document.createElement("button");
+  upBtn.className = "move-btn";
+  upBtn.innerHTML = "▲";
+  upBtn.onclick = () => moveBlock(div, -1);
+
+  const downBtn = document.createElement("button");
+  downBtn.className = "move-btn";
+  downBtn.innerHTML = "▼";
+  downBtn.onclick = () => moveBlock(div, 1);
+
+  const removeBtn = document.createElement("div");
+  removeBtn.className = "remove-btn";
+  removeBtn.innerHTML = "✕";
+  removeBtn.onclick = () => div.remove();
+
+  ops.appendChild(upBtn);
+  ops.appendChild(downBtn);
+  ops.appendChild(removeBtn);
+  header.appendChild(ops);
+
+  div.appendChild(header);
+
+  if (type === "playanim") {
+    const placeholders = ["@s 目标", "animation.player.attack", "controller.animation.player (可选)", "blend time (秒)"];
+    const defaults = ["@s", "animation.player.attack", "", "0.1"];
+    for (let i = 0; i < 4; i++) {
+      const inp = document.createElement("input");
+      inp.placeholder = placeholders[i];
+      inp.value = values?.[i] ?? defaults[i];
+      div.appendChild(inp);
+    }
+  } else if (type === "if") {
+    const inp = document.createElement("input");
+    inp.placeholder = "query.health > 5";
+    inp.value = values?.[0] ?? "";
+    div.appendChild(inp);
+  } else if (type === "wait") {
+    const inp = document.createElement("input");
+    inp.type = "number";
+    inp.placeholder = "ticks";
+    inp.value = values?.[0] ?? "10";
+    div.appendChild(inp);
+  } else if (type === "queue") {
+    const inp = document.createElement("input");
+    inp.placeholder = "combo_1";
+    inp.value = values?.[0] ?? "combo_1";
+    div.appendChild(inp);
+  }
+
+  return div;
+}
+
+function moveBlock(block, direction) {
+  const parent = block.parentNode;
+  const blocks = Array.from(parent.children);
+  const index = blocks.indexOf(block);
+  if (direction === -1 && index > 0) {
+    parent.insertBefore(block, blocks[index - 1]);
+  } else if (direction === 1 && index < blocks.length - 1) {
+    parent.insertBefore(block, blocks[index + 2]);
+  }
+}
+
+document.querySelectorAll(".block").forEach(el => {
+  el.addEventListener("click", () => {
+    const type = el.dataset.type;
+    const block = createBlock(type);
+    document.getElementById("workspace").appendChild(block);
+  });
+});
+
+function generate() {
+  const blocks = Array.from(document.querySelectorAll("#workspace .workspace-item"));
+  let commands = [];
+  let animDefs = {};
+  let controllerDefs = {};
+
+  blocks.forEach(block => {
+    const type = block.dataset.blockType;
+    const inputs = block.querySelectorAll('input');
+    const values = Array.from(inputs).map(i => i.value.trim());
+
+    if (type === "playanim") {
+      const [target, animId, controller, blend] = values;
+      if (!animId) return;
+      commands.push(`/playanimation ${target || '@s'} ${animId}${controller ? ` ${controller}` : ''} ${blend || '0.1'}`);
+      animDefs[animId] = { "loop": false, "animation_length": 0.5, "bones": {} };
+      if (controller) {
+        controllerDefs[controller] = {
+          "initial_state": "default",
+          "states": { "default": { "animations": [animId] } }
+        };
+      }
+    } else if (type === "if") {
+      if (values[0]) commands.push(`# IF (${values[0]})`);
+    } else if (type === "wait") {
+      commands.push(`# WAIT ${values[0] || '10'} ticks`);
+    } else if (type === "queue") {
+      commands.push(`# QUEUE: ${values[0] || 'default'}`);
+    }
+  });
+
+  let out = "=== MCBE 指令 ===\n" + (commands.length ? commands.join("\n") : "# 无指令") + "\n\n";
+  if (Object.keys(animDefs).length) {
+    out += "=== animation.json ===\n" + JSON.stringify({ animations: animDefs }, null, 2) + "\n\n";
+  }
+  if (Object.keys(controllerDefs).length) {
+    out += "=== animation_controllers.json ===\n" + JSON.stringify({ animation_controllers: controllerDefs }, null, 2);
+  }
+  document.getElementById("output").value = out;
+}
+
+function clearWorkspace() {
+  document.getElementById("workspace").innerHTML = '';
+}
+
+function downloadProject() {
+  const blocks = Array.from(document.querySelectorAll("#workspace .workspace-item")).map(b => ({
+    type: b.dataset.blockType,
+    values: Array.from(b.querySelectorAll('input')).map(i => i.value)
+  }));
+
+  const blob = new Blob([JSON.stringify({ version: "4.0", blocks }, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "mcbe_animation_project.json";
+  a.click();
+}
+
+function loadProjectPrompt() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const proj = JSON.parse(reader.result);
+        if (!proj.blocks) throw new Error("无效工程");
+        clearWorkspace();
+        proj.blocks.forEach(b => {
+          const block = createBlock(b.type, b.values);
+          document.getElementById("workspace").appendChild(block);
+        });
+      } catch (err) {
+        alert("❌ 工程文件格式错误！");
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+</script>
+
+</body>
+</html>
